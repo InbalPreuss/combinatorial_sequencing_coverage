@@ -123,7 +123,7 @@ if __name__ == '__main__':
             R_all = int(np.floor(R_all_value * l))
             b = int(np.floor(b_fraction * m))
 
-            if n < k or m < b or l < a:
+            if n < k:
                 continue
             part3_simulator = CompleteMessageSimulator(n, t, m, k, b, l, a, R_all, Q)
             part3_result = part3_simulator.simulate_parallel()
