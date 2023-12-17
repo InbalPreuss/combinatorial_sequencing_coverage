@@ -26,7 +26,7 @@ class CompleteSequenceSimulator:
                 success_count += 1
         return success_count / self.Q
 
-    def single_run_simulation(self, n, t, R, m, k, b, Q):
+    def single_run_simulation(self, n, t, R, m, k, b):
         single_simulator = SinglePositionSimulator(n, t, R, 1)
         # sequence = [np.random.choice(range(1, n + 1), k, replace=False) for _ in range(m)]
         # decoded_count = sum(single_simulator.simulate() for _ in sequence)
@@ -38,7 +38,7 @@ class CompleteSequenceSimulator:
         num_cores = max(os.cpu_count() - 1, 1)  # Ensure at least one core is used
         with Pool(processes=num_cores) as pool:
             results = pool.starmap(self.single_run_simulation,
-                                   [(self.n, self.t, self.R, self.m, self.k, self.b, self.Q) for _ in range(self.Q)])
+                                   [(self.n, self.t, self.R, self.m, self.k, self.b) for _ in range(self.Q)])
         success_count = sum(results)
         return success_count / self.Q
 

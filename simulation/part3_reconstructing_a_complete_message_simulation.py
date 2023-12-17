@@ -1,4 +1,6 @@
 import numpy as np
+from multiprocessing import Pool
+
 from part2_reconstructing_a_complete_combinatorial_sequence_simulation import CompleteSequenceSimulator
 
 class CompleteMessageSimulator:
@@ -24,3 +26,20 @@ class CompleteMessageSimulator:
             if decoded_sequences >= self.a:
                 success_count += 1
         return success_count / self.Q
+
+    def simulate_single_sequence(self, n, t, m, k, b, R_j):
+        sequence_simulator = CompleteSequenceSimulator(n, t, m, k, b, R_j, 1)
+        return sequence_simulator.simulate()
+
+    def simulate_parallel(self):
+        success_count = 0
+        with Pool() as pool:
+            for _ in range(self.Q):
+                reads_distribution = np.random.multinomial(self.R_all, [1 / self.l] * self.l)
+                results = pool.starmap(self.simulate_single_sequence,
+                                       [(self.n, self.t, self.m, self.k, self.b, R_j) for R_j in reads_distribution])
+                decoded_sequences = sum(results)
+                if decoded_sequences >= self.a:
+                    success_count += 1
+        return success_count / self.Q
+
