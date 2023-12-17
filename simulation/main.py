@@ -130,6 +130,7 @@ if __name__ == '__main__':
 
             df_row = pd.DataFrame([[n, t, m, b, Q, k, l, a, R_all, part3_result]], columns=part3_headers)
             df_row.to_csv(file, mode='a', header=False, index=False)
+            file.flush()
 
             # print(f"Part 3 Result: {part3_result}")
             # print(f"n={n}, t={t}, R_all={R_all}, Q={Q}, b={b}, k={k}, m={m}, a={a},l={l}")
