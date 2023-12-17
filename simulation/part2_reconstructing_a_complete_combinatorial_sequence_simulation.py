@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 from multiprocessing import Pool
 
@@ -30,7 +32,9 @@ class CompleteSequenceSimulator:
         return int(decoded_count >= b)
 
     def simulate_parallel(self):
-        with Pool() as pool:
+        # Use one fewer core than the total available
+        num_cores = max(os.cpu_count() - 1, 1)  # Ensure at least one core is used
+        with Pool(processes=num_cores) as pool:
             results = pool.starmap(self.single_run_simulation,
                                    [(self.n, self.t, self.R, self.m, self.k, self.b, self.Q) for _ in range(self.Q)])
         success_count = sum(results)
