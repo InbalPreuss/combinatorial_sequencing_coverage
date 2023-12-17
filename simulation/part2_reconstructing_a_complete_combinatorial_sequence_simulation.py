@@ -20,7 +20,7 @@ class CompleteSequenceSimulator:
         success_count = 0
         for _ in range(self.Q):
             # sequence = [np.random.choice(range(1, self.n + 1), self.k, replace=False) for _ in range(self.m)]
-            # decoded_count = sum(SinglePositionSimulator(self.n, self.t, self.R, self.Q).simulate() for _ in sequence) #TODO: Should this be the parameters? SinglePositionSimulator(self.n, self.t, self.R, self.Q).simulate()?
+            # decoded_count = sum(SinglePositionSimulator(self.n, self.t, self.R, self.Q).simulate() for _ in sequence)
             decoded_count = sum(SinglePositionSimulator(self.k, self.t, self.R, 1).simulate() for _ in range(self.m))
             if decoded_count >= self.b:
                 success_count += 1

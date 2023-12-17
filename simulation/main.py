@@ -66,7 +66,7 @@ if __name__ == '__main__':
     # log file
     progress_log_path = os.path.join(output_dir, 'progress2.log')
     # Write the total number of iterations to the log file
-    with open(progress_log_path, 'w') as progress_file:
+    with open(progress_log_path, 'a') as progress_file:
         progress_file.write(f"Total Iterations: {total_iterations}\n")
 
     # CSV preparation
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         for n, t, R, m, b_fraction, Q, k in tqdm(product(n_values, t_values, R_values, m_values, b_fractions, Q_values, k_values), total=total_iterations):
             count_iter += 1
             if count_iter % 100 == 0:
-                with open(progress_log_path, 'w') as progress_file:
+                with open(progress_log_path, 'a') as progress_file:
                     progress_file.write(f"Iteration number: {count_iter}\n")
 
             b = int(np.floor(b_fraction * m))
