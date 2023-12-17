@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
             b = int(np.floor(b_fraction * m))
 
-            if n < k or m < b:
+            if n < k:
                 continue
             part2_simulator = CompleteSequenceSimulator(n, t, m, k, b, R, Q)
             part2_result = part2_simulator.simulate_parallel()
