@@ -3,7 +3,7 @@ import os
 import numpy as np
 from multiprocessing import Pool
 
-from part1_reconstructing_a_single_combinatorial_position_simulation import SinglePositionSimulator
+from simulation.part1_reconstructing_a_single_combinatorial_position_simulation import SinglePositionSimulator
 
 class CompleteSequenceSimulator:
     def __init__(self, n, t, m, k, b, R, Q):

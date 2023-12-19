@@ -1,7 +1,7 @@
 import numpy as np
 from multiprocessing import Pool
 
-from part2_reconstructing_a_complete_combinatorial_sequence_simulation import CompleteSequenceSimulator
+from simulation.part2_reconstructing_a_complete_combinatorial_sequence_simulation import CompleteSequenceSimulator
 
 class CompleteMessageSimulator:
     def __init__(self, n, t, m, k, b, l, a, R_all, Q):

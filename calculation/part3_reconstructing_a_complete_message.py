@@ -1,14 +1,16 @@
 from math import ceil
+from typing import Tuple, Union, Any, Iterable
 
+from numpy import ndarray
+from scipy.special import kl_div
 from matplotlib import pyplot as plt
 from scipy.stats import norm, binom
 import numpy as np
-from part2_reconstructing_a_complete_combinatorial_sequence import run_part2_reconstructing_combinatorial_sequence
-from part1_reconstructing_a_single_combinatorial_position import run_part1_reconstructing_single_combinatorial_position
+from calculation.part2_reconstructing_a_complete_combinatorial_sequence import ReconstructingCombinatorialSequence
 
 
 class MessageDecoder:
-    def __init__(self, n, t, m, b, l, a, delta, eps):
+    def __init__(self, n, t, eps, R, m, b, method, l, a, delta):
         """
         Initialize the parameters for message reconstruction.
 
@@ -28,10 +30,12 @@ class MessageDecoder:
         self.a = a
         self.delta = delta
         self.eps = eps
+        self.R=R
+        self.method=method
 
     def visualize_values_and_prob(self, values, x_label, P_values, y_label, title):
         plt.plot(values, P_values, marker='o')
-        plt.axhline(y=np.sqrt(1 - delta), color='r', linestyle='--')
+        plt.axhline(y=np.sqrt(1 - self.delta), color='r', linestyle='--')
         plt.xlabel(x_label)
         plt.ylabel(y_label)
         plt.title(f'Finding {title}')
@@ -46,15 +50,7 @@ class MessageDecoder:
 
         T = 1  # Starting with an initial value for T (pi_R)
         while True:
-            # Call Part 1 with T to get π(T)
-            _, pi_T, _ = run_part1_reconstructing_single_combinatorial_position(self.n, self.t, self.eps, T)
-            # TODO: use binom.sf instead fo sum(pmf)
-            # Use π(T) as pi_R in Part 2 to get P_succ_single
-            P_succ_single = run_part2_reconstructing_combinatorial_sequence(self.m, self.b, pi_T, "normal")
-
-            # TODO: use binom.sf instead fo sum(pmf)
-            # Calculate P(X_T >= a)
-            P_X_T = sum(binom.pmf(k, self.l, P_succ_single) for k in range(self.a, self.l + 1))
+            P_X_T, P_succ_single, pi_T = self.calc_P_X_T(T=T)
 
             T_values.append(T)
             P_X_T_values.append(P_X_T)
@@ -66,24 +62,24 @@ class MessageDecoder:
                 return T
             T += 5  # Increment T
 
-    def calculate_R_all(self, T):
+    def calc_R_all(self, T):
         """
         Calculate R_all using an iterative search.
         """
         R_all_values = []
         P_E_values = []
 
-        R_all = T * l
+        R_all = T * self.l
         while True:
             # Calculate the probability P(E)
-            P_E = min(1, ((R_all + 1) ** self.l) * 2 ** (-R_all * self.epsilon(T, R_all)))
+            P_E = self.calc_P_E(T=T,R_all=R_all)
 
             R_all_values.append(R_all)
             P_E_values.append(1 - P_E)
 
-            print(f'R_all={R_all}, P_E={P_E}, 1-P_E={(1-P_E)}, np.sqrt(1 - self.delta)={np.sqrt(1 - self.delta)},1 - P_E >= np.sqrt(1 - self.delta)={1 - P_E >= np.sqrt(1 - self.delta)}')
+            print(f'R_all={R_all}, P_E={P_E}, 1-P_E={(1-P_E)}, np.sqrt(1 - self.delta)={np.sqrt(1 - self.delta)},1 - P_E >= np.sqrt(1 - self.delta)={1 - P_E >= np.sqrt(1 - self.delta)}, T={T}')
             if 1 - P_E >= np.sqrt(1 - self.delta):
-                self.visualize_values_and_prob(values=R_all_values,x_label='R_all', P_values=P_E_values, y_label='1 - P(E)', title='R_all')
+                # self.visualize_values_and_prob(values=R_all_values,x_label='R_all', P_values=P_E_values, y_label='1 - P(E)', title='R_all')
                 return R_all
             R_all = ceil(R_all*1.2)  # Increment R_all
 
@@ -91,26 +87,63 @@ class MessageDecoder:
         """
         Calculate the Kullback-Leibler divergence ε(T).
         """
-        Q = [1 / self.l] * l
-        P = [(T - 1) / R_all] + [(R_all - T + 1) / ((self.l - 1) * R_all)] * (l - 1)
-        return sum(p * np.log(p / q) for p, q in zip(P, Q))#TODO: find KL function
+        Q = [1 / self.l] * self.l
+        P = [(T - 1) / R_all] + [(R_all - T + 1) / ((self.l - 1) * R_all)] * (self.l - 1)
+        return np.sum(kl_div(P, Q))
 
     def run_decoder(self):
         T = self.find_T()
-        R_all = self.calculate_R_all(T)
+        R_all = self.calc_R_all(T)
         print(f"Calculated T: {T}, R_all: {R_all}")
+
+    def calc_P_X_T(self, T: int) -> tuple[Any, float, Any]:
+        # Use π(T) as pi_R in Part 2 to get P_succ_single
+        reconstructor = ReconstructingCombinatorialSequence(n=self.n, t=self.t, eps=self.eps, R=T, m=self.m, b=self.b, method=self.method)
+        P_succ_single, pi_T = reconstructor.calculate_probability()
+
+        # Calculate P(X_T >= a)
+        P_X_T = binom.sf(self.a - 1, self.l, P_succ_single)
+
+        return P_X_T, P_succ_single, pi_T
+
+    def calc_P_E(self, T, R_all):
+        try:
+            result = min(1, ((R_all + 1) ** self.l) * 2 ** (-R_all * self.epsilon(T, R_all)))
+        except OverflowError:
+            # Handle the overflow, for example, set result to a default value
+            result = 1
+
+        return result
 
 
 if __name__ == "__main__":
-    # Example input parameters
+    ##########
+    # Part 1 #
+    ##########
     n = 5  # Total number of unique building blocks in each position
     t = 3  # Required threshold on the number of observed occurrences
-    m = 120  # Sequence length (for each barcode)
-    b = 100  # Number of letters required to be successfully decoded in each barcode
+    eps = 0.01
+    R = 40  # Acceptable error threshold
+
+    ##########
+    # Part 2 #
+    ##########
+    m = 120  # Total number of letters in the sequence
+    b = 100  # Number of letters required to be successfully reconstructed
+    method = "binomial"
+
+    ##########
+    # Part 3 #
+    ##########
+    # Example input parameters
+    # n = 5  # Total number of unique building blocks in each position
+    # t = 3  # Required threshold on the number of observed occurrences
+    # m = 120  # Sequence length (for each barcode)
+    # b = 100  # Number of letters required to be successfully decoded in each barcode
     l = 10  # Number of barcodes in the message
     a = ceil(l*0.8)  # Number of barcodes required to be successfully decoded
-    eps = 0.01
+    # eps = 0.01
     delta = 0.1  # Acceptable error threshold
 
-    decoder = MessageDecoder(n, t, m, b, l, a, delta, eps)
+    decoder = MessageDecoder(n=n, t=t, eps=eps, R=R, m=m, b=b, method=method, l=l, a=a, delta=delta)
     decoder.run_decoder()

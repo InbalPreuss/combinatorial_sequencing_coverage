@@ -77,23 +77,14 @@ class ReconstructingSingleCombinatorialPosition:
                 break
         plt.vlines(index, 0, max(res_dist), 'r')
 
-        plt.show()
+        # plt.show()
+        plt.close()
         return dict_for_plot, res_prob, {tuple(k): v for k, v in zip(self.states, res_dist)}
 
-
-def run_part1_reconstructing_single_combinatorial_position(n, t, eps, R):
-    gcc = ReconstructingSingleCombinatorialPosition(n, t, eps, R)
-    rr, p, r = gcc.calc_results()
-    return rr, p, r
-
 if __name__ == '__main__':
-    n = 10
-    t = 3
-    eps = 0.1
-    R = 40
-
-    n = 5  # Total number of unique building blocks in each position
+    n = 7  # Total number of unique building blocks in each position
     t = 3  # Required threshold on the number of observed occurrences
     eps = 0.01
-    R = 40  # Acceptable error threshold
-    run_part1_reconstructing_single_combinatorial_position(n, t, eps, R)
+    R = 50  # Acceptable error threshold
+    part1_reconstructing_single_combinatorial_position = ReconstructingSingleCombinatorialPosition(n, t, eps, R)
+    rr, p, r = part1_reconstructing_single_combinatorial_position.calc_results()
