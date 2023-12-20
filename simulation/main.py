@@ -31,74 +31,74 @@ if __name__ == '__main__':
     # Create the directory
     os.makedirs(output_dir, exist_ok=True)
 
-    # ###################################
-    # ###### Run Part 1 Simulation ######
-    # ###################################
-    # #TODO: delete the examples
-    # # n_values, t_values, R_values, Q_values = [1], [1], [1, 2, 3], [1]
-    #
-    # # Calculate total iterations for the progress bar
-    # total_iterations = len(n_values) * len(t_values) * len(R_values) * len(Q_values)
-    #
-    # # CSV preparation
-    # part1_csv_path = os.path.join(output_dir, 'part1_SinglePositionSimulatorResults.csv')
-    # part1_headers = ['n', 't', 'R', 'Q', 'Result']
-    #
-    # # Open the CSV file and write headers
-    # with open(part1_csv_path, 'w', newline='') as file:
-    #     writer = pd.DataFrame(columns=part1_headers)
-    #     writer.to_csv(file, index=False)
-    #     for n, t, R, Q in tqdm(product(n_values, t_values, R_values, Q_values), total=total_iterations):
-    #         part1_simulator = SinglePositionSimulator(n, t, R, Q)
-    #         part1_result = part1_simulator.simulate()
-    #
-    #         df_row = pd.DataFrame([[n, t, R, Q, part1_result]], columns=part1_headers)
-    #         df_row.to_csv(file, mode='a', header=False, index=False)
-    #
+    ###################################
+    ###### Run Part 1 Simulation ######
+    ###################################
+    #TODO: delete the examples
+    # n_values, t_values, R_values, Q_values = [1], [1], [1, 2, 3], [1]
 
-    # ###################################
-    # ###### Run Part 2 Simulation ######
-    # ####################################
-    # # Calculate total iterations for the progress bar
-    # total_iterations = len(n_values) * len(t_values) * len(R_values) * len(Q_values) * len(m_values) * len(
-    #     b_fractions) * len(k_values)
-    #
-    # # log file
-    # progress_log_path = os.path.join(output_dir, 'progress2.log')
-    # # Write the total number of iterations to the log file
-    # with open(progress_log_path, 'a') as progress_file:
-    #     progress_file.write(f"Total Iterations: {total_iterations}\n")
-    #
-    # # CSV preparation
-    # part2_csv_path = os.path.join(output_dir, 'part2_CompleteSequenceSimulator.csv')
-    # part2_headers = ['n', 't', 'R', 'm', 'b', 'Q', 'k', 'Result']
-    #
-    # with open(part2_csv_path, 'w', newline='') as file:
-    #     writer = pd.DataFrame(columns=part2_headers)
-    #     writer.to_csv(file, index=False)
-    #     count_iter = 0
-    #     for n, t, R, m, b_fraction, Q, k in tqdm(product(n_values, t_values, R_values, m_values, b_fractions, Q_values, k_values), total=total_iterations):
-    #         count_iter += 1
-    #         if count_iter % 100 == 0:
-    #             with open(progress_log_path, 'a') as progress_file:
-    #                 progress_file.write(f"Iteration number: {count_iter}\n")
-    #
-    #         b = int(np.floor(b_fraction * m))
-    #
-    #         if n < k:
-    #             continue
-    #         part2_simulator = CompleteSequenceSimulator(n, t, m, k, b, R, Q)
-    #         part2_result = part2_simulator.simulate_parallel()
-    #         # part2_result = part2_simulator.simulate()
-    #
-    #         df_row = pd.DataFrame([[n, t, R, m, b, Q, k, part2_result]], columns=part2_headers)
-    #         df_row.to_csv(file, mode='a', header=False, index=False)
-    #         file.flush()
-    #
-    #         # print(f"Part 2 Result: {part2_result}")
-    #         # print(f"n={n}, t={t}, R={R}, Q={Q}, b={b}, k={k}")
-    #     with open(progress_log_path, 'w') as progress_file:
-    #         progress_file.write(f"End of Iterations part 2\n")
+    # Calculate total iterations for the progress bar
+    total_iterations = len(n_values) * len(t_values) * len(R_values) * len(Q_values)
+
+    # CSV preparation
+    part1_csv_path = os.path.join(output_dir, 'part1_SinglePositionSimulatorResults.csv')
+    part1_headers = ['n', 't', 'R', 'Q', 'Result']
+
+    # Open the CSV file and write headers
+    with open(part1_csv_path, 'w', newline='') as file:
+        writer = pd.DataFrame(columns=part1_headers)
+        writer.to_csv(file, index=False)
+        for n, t, R, Q in tqdm(product(n_values, t_values, R_values, Q_values), total=total_iterations):
+            part1_simulator = SinglePositionSimulator(n, t, R, Q)
+            part1_result = part1_simulator.simulate()
+
+            df_row = pd.DataFrame([[n, t, R, Q, part1_result]], columns=part1_headers)
+            df_row.to_csv(file, mode='a', header=False, index=False)
+
+
+    ###################################
+    ###### Run Part 2 Simulation ######
+    ####################################
+    # Calculate total iterations for the progress bar
+    total_iterations = len(n_values) * len(t_values) * len(R_values) * len(Q_values) * len(m_values) * len(
+        b_fractions) * len(k_values)
+
+    # log file
+    progress_log_path = os.path.join(output_dir, 'progress2.log')
+    # Write the total number of iterations to the log file
+    with open(progress_log_path, 'a') as progress_file:
+        progress_file.write(f"Total Iterations: {total_iterations}\n")
+
+    # CSV preparation
+    part2_csv_path = os.path.join(output_dir, 'part2_CompleteSequenceSimulator.csv')
+    part2_headers = ['n', 't', 'R', 'm', 'b', 'Q', 'k', 'Result']
+
+    with open(part2_csv_path, 'w', newline='') as file:
+        writer = pd.DataFrame(columns=part2_headers)
+        writer.to_csv(file, index=False)
+        count_iter = 0
+        for n, t, R, m, b_fraction, Q, k in tqdm(product(n_values, t_values, R_values, m_values, b_fractions, Q_values, k_values), total=total_iterations):
+            count_iter += 1
+            if count_iter % 100 == 0:
+                with open(progress_log_path, 'a') as progress_file:
+                    progress_file.write(f"Iteration number: {count_iter}\n")
+
+            b = int(np.floor(b_fraction * m))
+
+            if n < k:
+                continue
+            part2_simulator = CompleteSequenceSimulator(n, t, m, k, b, R, Q)
+            part2_result = part2_simulator.simulate_parallel()
+            # part2_result = part2_simulator.simulate()
+
+            df_row = pd.DataFrame([[n, t, R, m, b, Q, k, part2_result]], columns=part2_headers)
+            df_row.to_csv(file, mode='a', header=False, index=False)
+            file.flush()
+
+            # print(f"Part 2 Result: {part2_result}")
+            # print(f"n={n}, t={t}, R={R}, Q={Q}, b={b}, k={k}")
+        with open(progress_log_path, 'w') as progress_file:
+            progress_file.write(f"End of Iterations part 2\n")
 
     ###################################
     ###### Run Part 3 Simulation ######
