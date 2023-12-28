@@ -72,8 +72,7 @@ Probability of successfully reconstructing the entire sequence.
 * simulation/part3_reconstructing_a_complete_message_simulation.py
 
 Inputs:
-* Inherits `n`, `t`, `R` from previous parts.
-* `m`, b from Part 2.
+* Inherits `n`, `t`, `R`, `m`, `b`, from previous parts.
 * `l`: Number of barcodes in the message.
 * `a`: Number of barcodes required to be successfully decoded.
 
