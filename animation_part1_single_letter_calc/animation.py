@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     class General_Coupon_Collector():
 
-        def set_params(self, n, k, t):
+        def set_params(self, n, k, t, eps):
             """
 
             :param n: Number of unique coupons.
@@ -29,6 +29,7 @@ if __name__ == '__main__':
             self.n = n
             self.k = k
             self.t = t
+            self.eps = eps
             self._calc_state()
             self._calc_transition_matrix()
             self._calc_init_vec()
@@ -45,13 +46,13 @@ if __name__ == '__main__':
                 for j in range(self.t):
                     if state[j] == 0:
                         continue
-                    p = state[j] / self.n
+                    p = (1-self.eps) * (state[j] / self.n)
                     new_state = state.copy()
                     new_state[j] -= 1
                     new_state[j + 1] += 1
                     new_state_idx = self.states.index(new_state)
                     self.transition_matrix[state_idx, new_state_idx] = p
-                p = state[self.t] / self.n
+                p = (1-self.eps) * (state[self.t] / self.n) + self.eps
                 self.transition_matrix[state_idx, state_idx] = p
 
         def _calc_init_vec(self):
@@ -73,8 +74,10 @@ if __name__ == '__main__':
             plt.bar([str(x) for x in dict_for_plot.keys()], dict_for_plot.values())
             labels = [x if i % 1 == 0 else '' for i, x in enumerate(dict_for_plot.keys())]
             plt.ylim(0, 1)
-            plt.ylabel('Probability')
-            plt.xlabel('States')
+            plt.ylabel('Probability', fontsize=20)
+            plt.xlabel('States', fontsize=20)
+            plt.xticks(fontsize=15)
+            plt.yticks(fontsize=15)
             plt.title(
                 'Coupon Collector - ${}(R={})=$P(T(n={},t={})) $\leq {})=${:.3f}'.format(pi, s, self.n,
                                                                                               self.t, s, res_prob))
@@ -92,8 +95,9 @@ if __name__ == '__main__':
     n = 5
     k = n
     t = 1
+    eps = 0
     gcc = General_Coupon_Collector()
-    gcc.set_params(n, k, t)
+    gcc.set_params(n, k, t, eps)
     s = 30
 
     import numpy as np

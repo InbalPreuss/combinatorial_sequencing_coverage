@@ -1,9 +1,14 @@
+import re
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import combinations
 
+DIR_PLOT_PATH = 'plots/'
+DIR_PLOT_PATH_PART_1 = f'{DIR_PLOT_PATH}calculation_part1_plots/'
 
+import utils as uts
 class ReconstructingSingleCombinatorialPosition:
 
     def __init__(self, n, t, eps, R):
@@ -55,27 +60,36 @@ class ReconstructingSingleCombinatorialPosition:
         :param R: Number of rounds for collecting the copupon.
         :return:
         """
+        uts.make_dir(DIR_PLOT_PATH)
+        uts.make_dir(DIR_PLOT_PATH_PART_1)
+
         pi = "\u03c0"
         res_dist = self.init_vec @ np.linalg.matrix_power(self.transition_matrix, self.R)
         res_prob = res_dist[np.array(self.states)[:, self.t] >= self.n].sum()
         arr = np.column_stack((np.array([np.array(x) for x in self.states]), np.array(res_dist)))
         dict_for_plot = {tuple(x[:self.t + 1].astype(int)): x[-1] for x in \
                          pd.DataFrame(arr).sort_values([x for x in range(self.t, 0, -1)]).values}
-        fig = plt.figure(figsize=(15, 8))
+        plt.figure(figsize=(10, 6))
         plt.bar([str(x) for x in dict_for_plot.keys()], dict_for_plot.values())
         labels = [x if i % 1 == 0 else '' for i, x in enumerate(dict_for_plot.keys())]
-        plt.xticks(range(len(self.states)), labels, rotation='vertical')
-        plt.ylabel('Probability')
-        plt.xlabel('State')
-        plt.title(
-            'Coupon Collector - ${}(s={})=$P(T(n={},t={})) $\leq {})=${:.3f}'.format(pi, self.R, self.n, self.t,
-                                                                                     self.R, res_prob))
+        plt.xticks(range(len(self.states)), labels, rotation='vertical', fontsize=15)
+        plt.yticks(fontsize=15)
+        plt.ylabel('P', fontsize=20)
+        plt.xlabel('State', fontsize=20)
+        plt.ylim(0,1)
+        plt.subplots_adjust(bottom=0.23)
+        title = 'Coupon Collector - ${}(R={})=$P(T(n={},t={})) $\leq {})=${:.3f}'.format(pi, self.R, self.n, self.t, self.R, res_prob)
+        # plt.title(title)
         # Red line
         for i, state in enumerate(self.states):
             if state[self.t] >= self.n:
                 index = list(dict_for_plot).index(tuple(state))
                 break
         plt.vlines(index, 0, max(res_dist), 'r')
+
+        safe_title = f'Coupon Collector_pi(R={self.R})=P(T(n={self.n},t={self.t}))smallerthen{self.R}={res_prob})'
+        plt.savefig(f"{DIR_PLOT_PATH_PART_1}/{safe_title}.svg",
+                    format='svg')
 
         # plt.show()
         plt.close()
