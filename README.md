@@ -14,7 +14,7 @@ To run this project, you will need Python and several libraries, including NumPy
 ### Installation
 1. Clone the repository:
    ```sh
-   git clone [repository-url]
+   git clone https://github.com/InbalPreuss/combinatoric_coupon_collector.git
 
 2. Install the required libraries using requirements.txt:
     ```sh
