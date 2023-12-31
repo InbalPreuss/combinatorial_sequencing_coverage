@@ -10,10 +10,8 @@ from sympy.abc import pi
 if __name__ == '__main__':
     import numpy as np
     import pandas as pd
-    # from scipy.special import binom
     import matplotlib.pyplot as plt
     from itertools import combinations
-    import sympy
     from sympy.abc import pi
 
 
@@ -74,13 +72,13 @@ if __name__ == '__main__':
             plt.bar([str(x) for x in dict_for_plot.keys()], dict_for_plot.values())
             labels = [x if i % 1 == 0 else '' for i, x in enumerate(dict_for_plot.keys())]
             plt.ylim(0, 1)
-            plt.ylabel('Probability', fontsize=20)
-            plt.xlabel('States', fontsize=20)
-            plt.xticks(fontsize=15)
-            plt.yticks(fontsize=15)
-            plt.title(
-                'Coupon Collector - ${}(R={})=$P(T(n={},t={})) $\leq {})=${:.3f}'.format(pi, s, self.n,
-                                                                                              self.t, s, res_prob))
+            plt.ylabel('Probability', fontsize=25)
+            plt.xlabel('States ($S=(v(0),v(1))$)', fontsize=25)
+            plt.xticks(fontsize=23)
+            plt.yticks(fontsize=23)
+            # plt.title(
+            #     'Coupon Collector - ${}(R={})=$P(T(n={},t={})) $\leq {})=${:.3f}'.format(pi, s, self.n,
+            #                                                                                   self.t, s, res_prob))
 
             return dict_for_plot, res_prob, {tuple(k): v for k, v in zip(self.states, res_dist)}, [
                 [str(x) for x in dict_for_plot.keys()], dict_for_plot.values()]
@@ -88,8 +86,13 @@ if __name__ == '__main__':
 
     from matplotlib.animation import FuncAnimation
     import matplotlib.pyplot as plt
+if __name__ == '__main__':
+    is_animation = False
 
-    fig, ax = plt.subplots(1, 1)
+    if is_animation==True:
+        fig, ax = plt.subplots(1, 1)
+    else:
+        fig, ax = plt.subplots(10, 8)
     fig.set_size_inches(5, 5)
 
     n = 5
@@ -112,14 +115,15 @@ if __name__ == '__main__':
         ax.clear()
         ax.bar(plot_data[0], plot_data[1])
         ax.set_ylim(ymin=0, ymax=1)
-        ax.set_title('Coupon Collector - s={}'.format(frame))
+        ax.set_title('Coupon Collector - R={}'.format(frame))
 
 
     gcc = General_Coupon_Collector()
-    gcc.set_params(n=n, k=n, t=t)
+    gcc.set_params(n=n, k=n, t=t, eps=0)
 
-    ani = FuncAnimation(fig, update, frames=range(1, n_frames + 1))
-    ani.save('animation.gif', writer='ffmpeg')
+    if is_animation == True:
+        ani = FuncAnimation(fig, update, frames=range(1, n_frames + 1))
+        ani.save('animation.gif', writer='ffmpeg')
 
     for frame in range(1, s + 1):
         fig, ax = plt.subplots(1, 1)
@@ -128,7 +132,7 @@ if __name__ == '__main__':
         dict_for_plot, _, _, plot_data = gcc.calc_results(frame)
         ax.bar(plot_data[0], plot_data[1])
         ax.set_ylim(ymin=0, ymax=1)
-        ax.set_title('Coupon Collector - s={}'.format(frame))
+        ax.set_title('Coupon Collector - R={}'.format(frame))
 
         # Save the figure
         plt.savefig(f'plot_{frame}.svg', format='svg')

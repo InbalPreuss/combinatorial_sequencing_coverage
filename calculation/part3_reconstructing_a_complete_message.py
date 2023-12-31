@@ -18,7 +18,7 @@ DIR_PLOT_PATH_PART_3 = f'{DIR_PLOT_PATH}calculation_part3_plots/'
 
 
 class MessageDecoder:
-    def __init__(self, n, t, eps, R, m, b, method, l, a, delta, P_E_method):
+    def __init__(self, n, t, eps, m, b, method, l, a, delta, P_E_method):
         """
         Initialize the parameters for message reconstruction.
 
@@ -38,7 +38,6 @@ class MessageDecoder:
         self.a = a
         self.delta = delta
         self.eps = eps
-        self.R = R
         self.method = method
         self.P_E_method = P_E_method
 
@@ -54,12 +53,13 @@ class MessageDecoder:
         plt.yticks(fontsize=15)
         plt.xticks(fontsize=15)
         plt.ylim(-0.1,1.1)
-        plt.subplots_adjust(bottom=0.2)
+        # plt.subplots_adjust(bottom=0.2)
+        plt.subplots_adjust(bottom=0.2, left=0.15)
         plt.title(f'Finding {title}')
         if is_save_plot:
             uts.make_dir(DIR_PLOT_PATH)
             uts.make_dir(DIR_PLOT_PATH_PART_3)
-            plt.savefig(f"{DIR_PLOT_PATH_PART_3}/{title}_prob_with_different_R_recover_single_letter_part1_n={n},t={t},R={R}.svg",
+            plt.savefig(f"{DIR_PLOT_PATH_PART_3}/{title}_prob_with_different_R_recover_single_letter_part1_n={n},t={t}, delta={self.delta}.svg",
                         format='svg')
 
         plt.show()
@@ -86,12 +86,12 @@ class MessageDecoder:
 
             # Check if P(X_T >= a) meets the condition
             if P_X_T >= np.sqrt(1 - self.delta):
-                self.visualize_values_and_prob(values=T_values, x_label='T', P_values=pi_T_values,
-                                               y_label='P', title='Part 1 P', is_save_plot=True)
-                self.visualize_values_and_prob(values=T_values, x_label='T', P_values=P_succ_single_values,
-                                               y_label='P', title='Part 2 P', is_save_plot=True)
-                self.visualize_values_and_prob(values=T_values, x_label='T', P_values=P_X_T_values,
-                                               y_label='P(($X_{\mathrm{T}}$) >= a)', title='Part 3 P', is_save_plot=True, is_part_3=True)
+                self.visualize_values_and_prob(values=T_values, x_label='ρ', P_values=pi_T_values,
+                                               y_label='Probability', title='Part 1 P', is_save_plot=True)
+                self.visualize_values_and_prob(values=T_values, x_label='ρ', P_values=P_succ_single_values,
+                                               y_label='Probability', title='Part 2 P', is_save_plot=True)
+                self.visualize_values_and_prob(values=T_values, x_label='ρ', P_values=P_X_T_values,
+                                               y_label='P(($X_{\mathrm{ρ}}$) >= a)', title='Part 3 P', is_save_plot=True, is_part_3=True)
                 # self.visualize_values_and_prob(values=T_values, x_label='T', P_values=P_X_T_values,
                 #                                y_label='P(X_T >= a)', title='T')
                 return T
@@ -120,7 +120,7 @@ class MessageDecoder:
             if 1 - P_E >= np.sqrt(1 - self.delta):
                 self.visualize_values_and_prob(values=R_all_values,x_label='$R_{\mathrm{all}}$', P_values=P_E_values, y_label='1 - P(E)', title='R_all', is_save_plot=True, is_part_3=True)
                 return R_all
-            R_all = ceil(R_all * 1.2)  # Increment R_all
+            R_all = ceil(R_all * 1.05)  # Increment R_all
 
     def epsilon(self, T, R_all):
         """
@@ -182,16 +182,15 @@ if __name__ == "__main__":
     ##########
     # Part 1 #
     ##########
-    n = 3  # Total number of unique building blocks in each position
-    t = 2  # Required threshold on the number of observed occurrences
+    n = 7  # Total number of unique building blocks in each position
+    t = 4  # Required threshold on the number of observed occurrences
     eps = 0.01
-    R = 40  # Acceptable error threshold
 
     ##########
     # Part 2 #
     ##########
-    m = 10  # Total number of letters in the sequence
-    b = 8  # Number of letters required to be successfully reconstructed
+    m = 100  # Total number of letters in the sequence
+    b = 90  # Number of letters required to be successfully reconstructed
     method = "binomial"
 
     ##########
@@ -202,12 +201,13 @@ if __name__ == "__main__":
     # t = 3  # Required threshold on the number of observed occurrences
     # m = 120  # Sequence length (for each barcode)
     # b = 100  # Number of letters required to be successfully decoded in each barcode
-    l = 10  # Number of barcodes in the message
-    a = ceil(l * 0.8)  # Number of barcodes required to be successfully decoded
+    l = 1000  # Number of barcodes in the message
+    # a = ceil(l * 0.8)  # Number of barcodes required to be successfully decoded
+    a = 900  # Number of barcodes required to be successfully decoded
     # eps = 0.01
-    delta = 0.1  # Acceptable error threshold
-    P_E_method = 'calculation'
+    delta = 0.001  # Acceptable error threshold
+    P_E_method = 'simulation'
 
-    decoder = MessageDecoder(n=n, t=t, eps=eps, R=R, m=m, b=b, method=method, l=l, a=a, delta=delta,
+    decoder = MessageDecoder(n=n, t=t, eps=eps, m=m, b=b, method=method, l=l, a=a, delta=delta,
                              P_E_method=P_E_method)
     R_all = decoder.run_decoder()

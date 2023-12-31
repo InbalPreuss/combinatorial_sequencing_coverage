@@ -74,8 +74,8 @@ class ReconstructingSingleCombinatorialPosition:
         labels = [x if i % 1 == 0 else '' for i, x in enumerate(dict_for_plot.keys())]
         plt.xticks(range(len(self.states)), labels, rotation='vertical', fontsize=15)
         plt.yticks(fontsize=15)
-        plt.ylabel('P', fontsize=20)
-        plt.xlabel('State', fontsize=20)
+        plt.ylabel('Probability', fontsize=20)
+        plt.xlabel('States ($S=(v(0),v(1),v(2))$)', fontsize=20)
         plt.ylim(0,1)
         plt.subplots_adjust(bottom=0.23)
         title = 'Coupon Collector - ${}(R={})=$P(T(n={},t={})) $\leq {})=${:.3f}'.format(pi, self.R, self.n, self.t, self.R, res_prob)
@@ -96,9 +96,9 @@ class ReconstructingSingleCombinatorialPosition:
         return dict_for_plot, res_prob, {tuple(k): v for k, v in zip(self.states, res_dist)}
 
 if __name__ == '__main__':
-    n = 7  # Total number of unique building blocks in each position
-    t = 3  # Required threshold on the number of observed occurrences
+    n = 3  # Total number of unique building blocks in each position
+    t = 2  # Required threshold on the number of observed occurrences
     eps = 0.01
-    R = 50  # Acceptable error threshold
+    R = 1  # Acceptable error threshold
     part1_reconstructing_single_combinatorial_position = ReconstructingSingleCombinatorialPosition(n, t, eps, R)
     rr, p, r = part1_reconstructing_single_combinatorial_position.calc_results()

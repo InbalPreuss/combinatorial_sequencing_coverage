@@ -1,3 +1,4 @@
+import math
 import os
 
 import numpy as np
@@ -20,7 +21,7 @@ PLOTS_PATH = "plots"
 
 def plot_prob_with_different_R_recover_single_letter_calc_vs_simu_part1():
     n = 7  # Total number of unique building blocks in each position
-    t = 1  # Required threshold on the number of observed occurrences
+    t = 4  # Required threshold on the number of observed occurrences
     eps = 0.01
     R = 110  # Acceptable error threshold
     Q = 100
@@ -59,7 +60,7 @@ def plot_prob_with_different_R_recover_single_letter_calc_vs_simu_part1():
     plt.plot(R_values, P_simu_medians, label='Median Simulated Probability', color='red', linestyle='-', marker='x',
              linewidth=1.5)
 
-    plt.xlabel('Number of Reads ($R_{\mathrm{single}}$)', fontsize=20)
+    plt.xlabel('Number of Reads ($R$)', fontsize=20)
     # plt.tight_layout()
     plt.subplots_adjust(bottom=0.2)  # Adjust the value as needed
 
@@ -86,8 +87,8 @@ def plot_prob_with_different_R_recover_complete_combinatorial_sequence_calc_vs_s
     Q = 100
 
     # PART 2 PARAMS
-    m = 10
-    b = 9
+    m = 100
+    b = 100
     method = "binomial"
     k = n
 
@@ -125,7 +126,7 @@ def plot_prob_with_different_R_recover_complete_combinatorial_sequence_calc_vs_s
     plt.plot(R_values, P_simu_medians, label='Median Simulated Probability', color='red', linestyle='-', marker='x',
              linewidth=1.5)
 
-    plt.xlabel('Number of Reads ($R_{\mathrm{single}}$)', fontsize=20)
+    plt.xlabel('Number of Reads ($R$)', fontsize=20)
     plt.subplots_adjust(bottom=0.2)  # Adjust the value as needed
 
     plt.ylabel('Probability', fontsize=20)
@@ -160,7 +161,9 @@ def plot_prob_with_different_R_recover_message_PXT_PE_part3():
     l = 10
     a = 8
     delta = 0.1
-    P_E_method = 'simulation'
+    P_E_method = 'calculation'
+
+    R_all = 3000
 
     R_gap = 1
     R_values = []
@@ -174,7 +177,6 @@ def plot_prob_with_different_R_recover_message_PXT_PE_part3():
         P_X_T, _, _ = part3_message_decoder.calc_P_X_T(T=R_i)
         P_X_T_values.append(P_X_T)
 
-        R_all = 1000
         # R_all = part3_message_decoder.calc_R_all(T=R_i)
         if P_E_method == 'simulation':
             P_E = part3_message_decoder.simu_P_E(R_all=R_all, T=R_i)
@@ -187,14 +189,29 @@ def plot_prob_with_different_R_recover_message_PXT_PE_part3():
     plt.figure(figsize=(10, 6))
 
     # Line plot for calculated probability
-    plt.plot(R_values, P_X_T_values, label='$P_{\mathrm{X}_{\mathrm{T}}}$', color='blue', marker='o')
-    plt.plot(R_values, P_E_values, label='1-($P_{\mathrm{E}}$)', color='red', marker='o')
+    plt.plot(R_values, P_X_T_values, label='$P_{\mathrm{X}_{\mathrm{ρ}}}$', color='blue', marker='o')
+    plt.plot(R_values, P_E_values, label='1-$P(E)$', color='red', marker='o')
+
+    # Delta
+    threshold = math.sqrt(1-delta)
+    plt.axhline(y=threshold, color='deeppink', linestyle='--')
+    # plt.text(R_values[-1], delta_example, 'sqrt(1-δ)', color='red', verticalalignment='bottom')
+    plt.text(max(R_values) + 5, threshold, r'$\sqrt{1-\delta}$', color='deeppink', verticalalignment='bottom',
+             fontsize=12)
+
+    # Find indices where y-values are >= delta_example and add vertical lines
+    indices_P_E = [i for i, y in enumerate(P_E_values) if y >= threshold]
+    indices_P_X_T = [i for i, y in enumerate(P_X_T_values) if y >= threshold]
+    if indices_P_X_T and indices_P_E:
+        first_idx, last_idx = indices_P_X_T[0], indices_P_E[-1]
+        plt.axvline(x=R_values[first_idx], color='deeppink', linestyle='--')
+        plt.axvline(x=R_values[last_idx], color='deeppink', linestyle='--')
 
     # Add horizontal line at y = 0.8
-    delta_example = 0.8
-    plt.axhline(y=delta_example, color='red', linestyle='--')
+    delta_example = math.sqrt(1-0.2)
+    plt.axhline(y=delta_example, color='green', linestyle='--')
     # plt.text(R_values[-1], delta_example, 'sqrt(1-δ)', color='red', verticalalignment='bottom')
-    plt.text(max(R_values) + 5, delta_example, r'$\sqrt{1-\delta}$', color='red', verticalalignment='bottom',
+    plt.text(max(R_values) + 5, delta_example, r'$\sqrt{1-\delta}$', color='green', verticalalignment='bottom',
              fontsize=12)
 
     # Find indices where y-values are >= delta_example and add vertical lines
@@ -205,8 +222,8 @@ def plot_prob_with_different_R_recover_message_PXT_PE_part3():
         plt.axvline(x=R_values[first_idx], color='green', linestyle='--')
         plt.axvline(x=R_values[last_idx], color='green', linestyle='--')
 
-    plt.xlabel('Number of Reads (T)', fontsize=20)
-    plt.ylabel('Probability', fontsize=20)
+    plt.xlabel('Number of Reads (ρ)', fontsize=20)
+    plt.ylabel('Decoding Probability', fontsize=20)
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
     # plt.title('Probability with Different Number of Reads (T)')
@@ -228,6 +245,6 @@ if __name__ == '__main__':
     if not os.path.exists(PLOTS_PATH):
         os.makedirs(PLOTS_PATH)
 
-    plots_part_1()
-    plots_part_2()
+    # plots_part_1()
+    # plots_part_2()
     plots_part_3()
