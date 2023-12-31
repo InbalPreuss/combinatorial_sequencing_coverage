@@ -245,6 +245,6 @@ if __name__ == '__main__':
     if not os.path.exists(PLOTS_PATH):
         os.makedirs(PLOTS_PATH)
 
-    # plots_part_1()
-    # plots_part_2()
+    plots_part_1()
+    plots_part_2()
     plots_part_3()

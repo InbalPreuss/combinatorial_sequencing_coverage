@@ -59,17 +59,6 @@ class ReconstructingCombinatorialSequence:
 
         return p
 
-
-# Example usage
-# def run_part2_reconstructing_combinatorial_sequence(m: int, b: int, pi_R: float, method: str) -> float:
-#     reconstructor = ReconstructingCombinatorialSequence(m, b, pi_R, method=method)
-#     P_succ_single = reconstructor.calculate_probability()
-#
-#     print(f"Probability of successful decoding: {P_succ_single}")
-#
-#     return P_succ_single
-
-
 if __name__ == '__main__':
     ##########
     # Part 1 #

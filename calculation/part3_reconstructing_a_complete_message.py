@@ -196,15 +196,9 @@ if __name__ == "__main__":
     ##########
     # Part 3 #
     ##########
-    # Example input parameters
-    # n = 5  # Total number of unique building blocks in each position
-    # t = 3  # Required threshold on the number of observed occurrences
-    # m = 120  # Sequence length (for each barcode)
-    # b = 100  # Number of letters required to be successfully decoded in each barcode
     l = 1000  # Number of barcodes in the message
     # a = ceil(l * 0.8)  # Number of barcodes required to be successfully decoded
     a = 900  # Number of barcodes required to be successfully decoded
-    # eps = 0.01
     delta = 0.001  # Acceptable error threshold
     P_E_method = 'simulation'
 
