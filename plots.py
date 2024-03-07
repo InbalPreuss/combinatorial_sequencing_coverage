@@ -172,7 +172,7 @@ def plot_prob_with_different_R_recover_message_PXT_PE_part3():
     for R_i in range(45, R, R_gap):
         R_values.append(R_i)
 
-        part3_message_decoder = part3_calc.MessageDecoder(n=n, t=t, eps=eps, R=R_i, m=m, b=b, method=method, l=l, a=a,
+        part3_message_decoder = part3_calc.MessageDecoder(n=n, t=t, eps=eps, m=m, b=b, method=method, l=l, a=a,
                                                           delta=delta, P_E_method=P_E_method)
         P_X_T, _, _ = part3_message_decoder.calc_P_X_T(T=R_i)
         P_X_T_values.append(P_X_T)
@@ -189,7 +189,7 @@ def plot_prob_with_different_R_recover_message_PXT_PE_part3():
     plt.figure(figsize=(10, 6))
 
     # Line plot for calculated probability
-    plt.plot(R_values, P_X_T_values, label='$P_{\mathrm{X}_{\mathrm{ρ}}}$', color='blue', marker='o')
+    plt.plot(R_values, P_X_T_values, label=r'$P_{\mathrm{X}_{\mathrm{ρ}}}$', color='blue', marker='o')
     plt.plot(R_values, P_E_values, label='1-$P(E)$', color='red', marker='o')
 
     # Delta
