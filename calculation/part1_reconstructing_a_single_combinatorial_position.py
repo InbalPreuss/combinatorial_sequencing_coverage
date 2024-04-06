@@ -65,7 +65,7 @@ class ReconstructingSingleCombinatorialPosition:
 
         pi = "\u03c0"
         res_dist = self.init_vec @ np.linalg.matrix_power(self.transition_matrix, self.R)
-        res_prob = res_dist[np.array(self.states)[:, self.t] >= self.n].sum()
+        res_prob = min(res_dist[np.array(self.states)[:, self.t] >= self.n].sum(), 0.99)
         arr = np.column_stack((np.array([np.array(x) for x in self.states]), np.array(res_dist)))
         dict_for_plot = {tuple(x[:self.t + 1].astype(int)): x[-1] for x in \
                          pd.DataFrame(arr).sort_values([x for x in range(self.t, 0, -1)]).values}
@@ -99,6 +99,6 @@ if __name__ == '__main__':
     n = 3  # Total number of unique building blocks in each position
     t = 2  # Required threshold on the number of observed occurrences
     eps = 0.01
-    R = 1  # Acceptable error threshold
+    R = 5  # Acceptable error threshold
     part1_reconstructing_single_combinatorial_position = ReconstructingSingleCombinatorialPosition(n, t, eps, R)
     rr, p, r = part1_reconstructing_single_combinatorial_position.calc_results()

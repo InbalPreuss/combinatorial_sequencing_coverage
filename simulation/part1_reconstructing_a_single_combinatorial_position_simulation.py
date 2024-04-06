@@ -23,3 +23,8 @@ class SinglePositionSimulator:
         plt.ylabel(y_label)
         plt.title(f'Finding {title}')
         plt.show()
+
+
+if __name__ == '__main__':
+    part1_single_position_simulator = SinglePositionSimulator(n=5, t=2, R=10, Q=7)
+    part1_single_position_simulator.simulate()

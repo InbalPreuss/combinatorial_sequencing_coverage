@@ -1,3 +1,4 @@
+import time
 import math
 import os
 
@@ -22,7 +23,7 @@ PLOTS_PATH = "plots"
 def plot_prob_with_different_R_recover_single_letter_calc_vs_simu_part1():
     n = 7  # Total number of unique building blocks in each position
     t = 4  # Required threshold on the number of observed occurrences
-    eps = 0.01
+    eps = 0
     R = 110  # Acceptable error threshold
     Q = 100
 
@@ -70,7 +71,7 @@ def plot_prob_with_different_R_recover_single_letter_calc_vs_simu_part1():
     plt.yticks(fontsize=15)  # Set x-ticks to R_values
     plt.legend(fontsize=13)
     # Save the figure as an SVG file
-    plt.savefig(f"{PLOTS_PATH}/prob_with_different_R_recover_single_letter_part1_n={n},t={t},R={R}.svg", format='svg')
+    plt.savefig(f"{PLOTS_PATH}/prob_with_different_R_recover_single_letter_part1_n={n},t={t},R={R},eps={eps}.svg", format='svg')
     plt.show()
 
 
@@ -81,7 +82,7 @@ def plots_part_1():
 def plot_prob_with_different_R_recover_complete_combinatorial_sequence_calc_vs_simu_part2():
     # PART 1 PARAMS
     n = 7  # Total number of unique building blocks in each position
-    t = 4  # Required threshold on the number of observed occurrences
+    t = 2  # Required threshold on the number of observed occurrences
     eps = 0.01
     R = 140  # Acceptable error threshold
     Q = 100
@@ -170,10 +171,11 @@ def plot_prob_with_different_R_recover_message_PXT_PE_part3():
     P_X_T_values = []
     P_E_values = []
     for R_i in range(45, R, R_gap):
+        print(f'R_i={R_i}, R={R}')
         R_values.append(R_i)
-
         part3_message_decoder = part3_calc.MessageDecoder(n=n, t=t, eps=eps, m=m, b=b, method=method, l=l, a=a,
-                                                          delta=delta, P_E_method=P_E_method)
+                                                          delta=delta, P_E_method=P_E_method, is_print=False)
+
         P_X_T, _, _ = part3_message_decoder.calc_P_X_T(T=R_i)
         P_X_T_values.append(P_X_T)
 
@@ -237,14 +239,66 @@ def plot_prob_with_different_R_recover_message_PXT_PE_part3():
     plt.show()
 
 
+def calc_running_time():
+    # PART 1 PARAMS
+    n = 7  # Total number of unique building blocks in each position
+    t = 3  # Required threshold on the number of observed occurrences
+    eps = 0.01
+
+    # PART 2 PARAMS
+    m = 10
+    b = 8
+    method = "binomial"
+
+    # PART 3
+    l = 10
+    a = 8
+    delta = 0.1
+    P_E_method_arr = ['simulation', 'calculation']
+
+    R_all = 3000
+    T = math.ceil(R_all / l)
+
+    Q = 100
+
+    for P_E_method in P_E_method_arr:
+        start_time_calc = time.time()
+        part3_message_decoder = part3_calc.MessageDecoder(n=n, t=t, eps=eps, m=m, b=b, method=method, l=l, a=a,
+                                                          delta=delta, P_E_method=P_E_method, is_print=False)
+
+        P_X_T, _, _ = part3_message_decoder.calc_P_X_T(T=T)
+        print(f'T={T}, part3 P_X_T={P_X_T}, np.sqrt(1 - self.delta)={np.sqrt(1 - delta)}, P_X_T >= np.sqrt(1 - self.delta)={P_X_T >= np.sqrt(1 - delta)}')
+
+
+        # R_all = part3_message_decoder.calc_R_all(T=R_i)
+        if P_E_method == 'simulation':
+            P_E = part3_message_decoder.simu_P_E(R_all=R_all, T=T)
+        else:
+            P_E = part3_message_decoder.calc_P_E(R_all=R_all, T=T)
+        print(
+            f'R_all={R_all}, P_E={P_E}, 1-P_E={(1 - P_E)}, np.sqrt(1 - self.delta)={np.sqrt(1 - delta)},1 - P_E >= np.sqrt(1 - self.delta)={1 - P_E >= np.sqrt(1 - delta)}, T={T}')
+
+        end_time_calc = time.time()
+
+        print(f'calc, {P_E_method}: end_time_calc - start_time_calc= {end_time_calc-start_time_calc}')
+
+    start_time_sim = time.time()
+    part3_simulator = part3_simu.CompleteMessageSimulator(n=n, t=t, m=m, k=n, b=b, l=l, a=a, R_all=R_all, Q=Q)
+    p = part3_simulator.simulate()
+    end_time_sim = time.time()
+    print(f'sim: end_time_sim - start_time_sim={end_time_sim-start_time_sim}')
+    print(f'count_succ/Q={p}')
+
+
 def plots_part_3():
-    plot_prob_with_different_R_recover_message_PXT_PE_part3()
+    # plot_prob_with_different_R_recover_message_PXT_PE_part3()
+    calc_running_time()
 
 
 if __name__ == '__main__':
     if not os.path.exists(PLOTS_PATH):
         os.makedirs(PLOTS_PATH)
 
-    plots_part_1()
-    plots_part_2()
+    # plots_part_1()
+    # plots_part_2()
     plots_part_3()

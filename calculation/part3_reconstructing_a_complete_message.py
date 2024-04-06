@@ -18,7 +18,7 @@ DIR_PLOT_PATH_PART_3 = f'{DIR_PLOT_PATH}calculation_part3_plots/'
 
 
 class MessageDecoder:
-    def __init__(self, n, t, eps, m, b, method, l, a, delta, P_E_method):
+    def __init__(self, n, t, eps, m, b, method, l, a, delta, P_E_method, is_print=True):
         """
         Initialize the parameters for message reconstruction.
 
@@ -40,6 +40,7 @@ class MessageDecoder:
         self.eps = eps
         self.method = method
         self.P_E_method = P_E_method
+        self.is_print = is_print
 
     def visualize_values_and_prob(self, values, x_label, P_values, y_label, title, is_save_plot=False, is_part_3=False):
         plt.plot(values, P_values, marker='o')
@@ -59,7 +60,7 @@ class MessageDecoder:
         if is_save_plot:
             uts.make_dir(DIR_PLOT_PATH)
             uts.make_dir(DIR_PLOT_PATH_PART_3)
-            plt.savefig(f"{DIR_PLOT_PATH_PART_3}/{title}_prob_with_different_R_recover_single_letter_part1_n={n},t={t}, delta={self.delta}.svg",
+            plt.savefig(f"{DIR_PLOT_PATH_PART_3}/{title}_prob_with_different_R_recover_single_letter_part1_n={self.n},t={self.t}, delta={self.delta}.svg",
                         format='svg')
 
         plt.show()
@@ -81,8 +82,9 @@ class MessageDecoder:
             P_X_T_values.append(P_X_T)
             P_succ_single_values.append(P_succ_single)
             pi_T_values.append(pi_T)
-            print(
-                f'T={T}, part1 pi_T={pi_T}, part2 P_succ_single={P_succ_single}, part3 P_X_T={P_X_T}, np.sqrt(1 - self.delta)={np.sqrt(1 - self.delta)}, P_X_T >= np.sqrt(1 - self.delta)={P_X_T >= np.sqrt(1 - self.delta)}')
+            if self.is_print:
+                print(
+                    f'T={T}, part1 pi_T={pi_T}, part2 P_succ_single={P_succ_single}, part3 P_X_T={P_X_T}, np.sqrt(1 - self.delta)={np.sqrt(1 - self.delta)}, P_X_T >= np.sqrt(1 - self.delta)={P_X_T >= np.sqrt(1 - self.delta)}')
 
             # Check if P(X_T >= a) meets the condition
             if P_X_T >= np.sqrt(1 - self.delta):
@@ -107,16 +109,16 @@ class MessageDecoder:
         R_all = T * self.l
         while True:
             # Calculate the probability P(E)
-            if P_E_method == 'simulation':
+            if self.P_E_method == 'simulation':
                 P_E = self.simu_P_E(T=T, R_all=R_all)
             else:
                 P_E = self.calc_P_E(T=T, R_all=R_all)
 
             R_all_values.append(R_all)
             P_E_values.append(1 - P_E)
-
-            print(
-                f'R_all={R_all}, P_E={P_E}, 1-P_E={(1 - P_E)}, np.sqrt(1 - self.delta)={np.sqrt(1 - self.delta)},1 - P_E >= np.sqrt(1 - self.delta)={1 - P_E >= np.sqrt(1 - self.delta)}, T={T}')
+            if self.is_print:
+                print(
+                    f'R_all={R_all}, P_E={P_E}, 1-P_E={(1 - P_E)}, np.sqrt(1 - self.delta)={np.sqrt(1 - self.delta)},1 - P_E >= np.sqrt(1 - self.delta)={1 - P_E >= np.sqrt(1 - self.delta)}, T={T}')
             if 1 - P_E >= np.sqrt(1 - self.delta):
                 self.visualize_values_and_prob(values=R_all_values,x_label='$R_{\mathrm{all}}$', P_values=P_E_values, y_label='1 - P(E)', title='R_all', is_save_plot=True, is_part_3=True)
                 return R_all
@@ -133,7 +135,8 @@ class MessageDecoder:
     def run_decoder(self):
         T = self.find_T()
         R_all = self.calc_R_all(T)
-        print(f"Calculated T: {T}, R_all: {R_all}")
+        if self.is_print:
+            print(f"Calculated T: {T}, R_all: {R_all}")
         return R_all
 
     def calc_P_X_T(self, T: int) -> tuple[Any, float, Any]:
@@ -154,7 +157,7 @@ class MessageDecoder:
             # Handle the overflow, for example, set result to a default value
             P_E = 1
 
-        return P_E
+        return min(P_E,0.99)
 
     def simu_P_E(self, T, R_all):
         N = ceil(100 * 1 / self.delta)
@@ -175,7 +178,7 @@ class MessageDecoder:
         plt.ylabel('freq')
         plt.close()
 
-        return P_E
+        return min(P_E, 0.99)
 
 
 if __name__ == "__main__":
@@ -200,6 +203,35 @@ if __name__ == "__main__":
     # a = ceil(l * 0.8)  # Number of barcodes required to be successfully decoded
     a = 900  # Number of barcodes required to be successfully decoded
     delta = 0.001  # Acceptable error threshold
+    P_E_method = 'simulation'
+
+    decoder = MessageDecoder(n=n, t=t, eps=eps, m=m, b=b, method=method, l=l, a=a, delta=delta,
+                             P_E_method=P_E_method)
+    R_all = decoder.run_decoder()
+
+def calc_running_time():
+    R=list(range(45,111))
+    ##########
+    # Part 1 #
+    ##########
+    n = 7  # Total number of unique building blocks in each position
+    t = 4  # Required threshold on the number of observed occurrences
+    eps = 0.01
+
+    ##########
+    # Part 2 #
+    ##########
+    m = 100  # Total number of letters in the sequence
+    b = 80  # Number of letters required to be successfully reconstructed
+    method = "binomial"
+
+    ##########
+    # Part 3 #
+    ##########
+    l = 100  # Number of barcodes in the message
+    # a = ceil(l * 0.8)  # Number of barcodes required to be successfully decoded
+    a = 80  # Number of barcodes required to be successfully decoded
+    delta = 0.1  # Acceptable error threshold
     P_E_method = 'simulation'
 
     decoder = MessageDecoder(n=n, t=t, eps=eps, m=m, b=b, method=method, l=l, a=a, delta=delta,
